@@ -66,7 +66,9 @@ flutter:
 
   assets:
   - img/book.png
+  - img/book.svg
   - img/home.png
+  - img/home.svg
   - img/status.png
   - img/profile.png
   - img/logo.png
@@ -77,6 +79,7 @@ flutter:
   - img/makanan.png
   - img/pesanAntar.png
   - img/menu.png
+  - img/menu.svg
 
   # To add assets to your application, add an assets section, like this:
   # assets:

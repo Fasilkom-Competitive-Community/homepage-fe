@@ -23,6 +23,12 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   late TabController controller;
+  String _warnaAktif = "#F3C703";
+  String _warnaTidakAktif = "#1E1E1E";
+  String _warnaBeranda = "#F3C703";
+  String _warnaRiwayat = "#1E1E1E";
+  String _warnaMenu = "#1E1E1E";
+
   bool card = true;
   Color warna = '#ffffff'.toColor();
   Widget box({width: 100.0, height: 100.0}) => Container(
@@ -44,9 +50,28 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     });
   }
 
+  int selectedTabbar = -1;
+
+  void _ubahWarna2(int indexActiveTabbar) {
+    setState(() {
+      if (indexActiveTabbar == selectedTabbar) {
+        // toggle tabbar
+        selectedTabbar = -1;
+      } else {
+        selectedTabbar = indexActiveTabbar;
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    focusNodeLokasiTujuan.addListener(() {
+      setState(() {});
+    });
+    focusNodeTitikJemput.addListener(() {
+      setState(() {});
+    });
     controller = TabController(length: 3, vsync: this);
     getCurrentLocation();
   }
@@ -56,6 +81,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     controller.dispose();
     super.dispose();
   }
+
+  bool stateFocusTextfield = false;
+  FocusNode focusNodeTitikJemput = FocusNode();
+  FocusNode focusNodeLokasiTujuan = FocusNode();
 
   Widget buildTopBar() {
     return Wrap(
@@ -70,7 +99,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           ),
           decoration: const BoxDecoration(
               color: Colors.white,
-              boxShadow: [BoxShadow(blurRadius: 20.0)],
+              boxShadow: [BoxShadow(blurRadius: 0)],
               borderRadius: BorderRadius.only(
                   bottomRight: Radius.circular(30.0),
                   bottomLeft: Radius.circular(30.0))),
@@ -102,10 +131,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       ],
                     ),
                     Expanded(child: Container()),
-                    //  Image.asset(
-                    //   "img/logo.png",
-                    //   fit: BoxFit.contain,
-                    // ),
+                    Image.asset(
+                      "img/logo.png",
+                      scale: 2.7,
+                    ),
                   ],
                 ),
               ),
@@ -115,6 +144,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               Container(
                 // padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
                 child: TextField(
+                  focusNode: focusNodeTitikJemput,
                   // style: TextStyle(color: Colors.pinkAccent, height:
                   //     MediaQuery.of(context).size.height/80),
                   decoration: InputDecoration(
@@ -137,6 +167,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               Container(
                 // padding: const EdgeInsets.fromLTRB(20, 0, 20, 25),
                 child: TextField(
+                  focusNode: focusNodeLokasiTujuan,
                   decoration: InputDecoration(
                       contentPadding: EdgeInsets.symmetric(vertical: 10),
                       border: OutlineInputBorder(
@@ -158,116 +189,176 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget buildBottomBar() {
+  Widget buildPesanSekarang() {
     return Container(
-      height: 270.0,
       padding: const EdgeInsets.symmetric(
-        vertical: 20,
-        horizontal: 10,
+        horizontal: 20,
       ),
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          boxShadow: [BoxShadow(blurRadius: 40.0)],
+      width: MediaQuery.of(context).size.width,
+      height: 120.0,
+      color: const Color.fromRGBO(0, 0, 0, 0),
+      child: Container(
+        decoration: const BoxDecoration(
           borderRadius: BorderRadius.only(
-              topRight: Radius.circular(30.0), topLeft: Radius.circular(30.0))),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    _ubahWarna(0);
-                  },
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                          color: selectedCard == 0
-                              ? '#33BC51'.toColor()
-                              : "#EBEFED".toColor(),
+            topLeft: Radius.circular(40),
+            topRight: Radius.circular(40),
+          ),
+          color: Color(0xFFF3C703),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Text(
+              "😀🤚🏻",
+              style: TextStyle(fontSize: 20.0),
+            ),
+            Text(
+              "Kamu Mau Pergi?",
+              style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.w600),
+            ),
+            Text(
+              "Buruan isi alamatnya, segera berangakat deh",
+              style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.w300),
+            )
+          ],
+        ),
+      ),
+    );
+    //
+  }
+
+  Widget buildBottomBar() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // kamu mau pergi
+        buildPesanSekarang(),
+        Container(
+          height: 270.0,
+          padding: const EdgeInsets.symmetric(
+            vertical: 20,
+            horizontal: 10,
+          ),
+          decoration: const BoxDecoration(
+              color: Colors.white,
+              boxShadow: [BoxShadow(blurRadius: 0)],
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(30.0),
+                  topLeft: Radius.circular(30.0))),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        _ubahWarna(0);
+                      },
+                      child: Card(
+                        color: selectedCard == 0
+                                  ? '#F7FCF9'.toColor()
+                                  : "#FFFFFF".toColor(),
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                              color: selectedCard == 0
+                                  ? '#33BC51'.toColor()
+                                  : "#EBEFED".toColor(),
+                            ),
+                            borderRadius: BorderRadius.circular(10.0)),
+                        child: Container(
+                          padding: EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(),
+                          child: Column(
+                            // mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Image.asset("img/motor.png"),
+                              Text("Motor")
+                            ],
+                          ),
                         ),
-                        borderRadius: BorderRadius.circular(10.0)),
-                    child: Container(
-                      padding: EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(),
-                      child: Column(
-                        children: [Image.asset("img/motor.png"), Text("Motor")],
                       ),
                     ),
                   ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    _ubahWarna(1);
-                  },
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                          color: selectedCard == 1
-                              ? '#33BC51'.toColor()
-                              : "#EBEFED".toColor(),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        _ubahWarna(1);
+                      },
+                      child: Card(
+                        color: selectedCard == 1
+                                  ? '#F7FCF9'.toColor()
+                                  : "#FFFFFF".toColor(),
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                              color: selectedCard == 1
+                                  ? '#33BC51'.toColor()
+                                  : "#EBEFED".toColor(),
+                            ),
+                            borderRadius: BorderRadius.circular(10.0)),
+                        child: Container(
+                          padding: EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(),
+                          child: Column(
+                            children: [
+                              Image.asset("img/makanan.png"),
+                              Text("Makanan")
+                            ],
+                          ),
                         ),
-                        borderRadius: BorderRadius.circular(10.0)),
-                    child: Container(
-                      padding: EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(),
-                      child: Column(
-                        children: [
-                          Image.asset("img/makanan.png"),
-                          Text("Makanan")
-                        ],
                       ),
                     ),
                   ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    _ubahWarna(2);
-                  },
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                          color: selectedCard == 2
-                              ? '#33BC51'.toColor()
-                              : "#EBEFED".toColor(),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        _ubahWarna(2);
+                      },
+                      child: Card(
+                        color: selectedCard == 2
+                                  ? '#F7FCF9'.toColor()
+                                  : "#FFFFFF".toColor(),
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                              color: selectedCard == 2
+                                  ? '#33BC51'.toColor()
+                                  : "#EBEFED".toColor(),
+                            ),
+                            borderRadius: BorderRadius.circular(10.0)),
+                        child: Container(
+                          padding: EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(),
+                          child: Column(
+                            children: [
+                              Image.asset("img/pesanAntar.png"),
+                              Text("Pesan Antar")
+                            ],
+                          ),
                         ),
-                        borderRadius: BorderRadius.circular(10.0)),
-                    child: Container(
-                      padding: EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(),
-                      child: Column(
-                        children: [
-                          Image.asset("img/pesanAntar.png"),
-                          Text("Pesan Antar")
-                        ],
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
+              const SizedBox(
+                height: 10,
+              ),
+              SizedBox(
+                width: 300.0,
+                height: 50.0,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      shape: StadiumBorder(),
+                      backgroundColor: '#F3C703'.toColor()),
+                  child: const Text("Pesan Sekarang"),
+                  onPressed: (() => context),
+                ),
+              )
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          SizedBox(
-            width: 300.0,
-            height: 50.0,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  shape: StadiumBorder(), backgroundColor: '#F3C703'.toColor()),
-              child: const Text("Pesan Sekarang"),
-              onPressed: (() => context),
-            ),
-          )
-        ],
-      ),
+        ),
+      ],
     );
     //
   }
@@ -334,17 +425,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             buildMapBackground(),
             // bar atas
             buildTopBar(),
-            // kamu mau pergi
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: buildBottomBar(),
-            ),
-
             // bottom bar
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: buildBottomBar(),
-            ),
+            conditionalBuildBottomBar(),
             // bottom navigation bar
             Align(
               alignment: Alignment.bottomCenter,
@@ -366,32 +448,66 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         controller: controller,
         tabs: [
           Tab(
-              icon: Image.asset(
-                "img/home.png",
-                color: '#F3C703'.toColor(),
-              ),
-              child: Text(
-                "Beranda",
-                style: TextStyle(color: '#1E1E1E'.toColor()),
-              )),
+            icon: Image.asset(
+              "img/home.png",
+              // scale: 1.5,
+              // color: _warnaBeranda.toColor(),
+              // width: 100.0,
+              color: '#F3C703'.toColor(),
+            ),
+            // ),
+
+            child: Text(
+              "Beranda",
+              style: TextStyle(color: '#1E1E1E'.toColor()),
+            ),
+            // SizedBox(height: 0,)
+          ),
           Tab(
-              icon: Image.asset(
-                "img/book.png",
-              ),
-              child: Text(
-                "Riwayat",
-                style: TextStyle(color: '#1E1E1E'.toColor()),
-              )),
+            icon: Image.asset(
+              "img/book.png",
+              // scale: 1.5,
+              // color: _warnaBeranda.toColor(),
+              // width: 100.0,
+              color: '#D4D8D6'.toColor(),
+            ),
+            // ),
+
+            child: Text(
+              "Riwayat",
+              style: TextStyle(color: '#1E1E1E'.toColor()),
+            ),
+            // SizedBox(height: 0,)
+          ),
           Tab(
-              icon: Image.asset(
-                "img/menu.png",
-              ),
-              child: Text(
-                "Menu",
-                style: TextStyle(color: '#1E1E1E'.toColor()),
-              )),
+            icon: Image.asset(
+              "img/menu.png",
+              // scale: 1.5,
+              // color: _warnaBeranda.toColor(),
+              // width: 100.0,
+              color: '#D4D8D6'.toColor(),
+            ),
+            // ),
+
+            child: Text(
+              "Menu",
+              style: TextStyle(color: '#1E1E1E'.toColor()),
+            ),
+            // SizedBox(height: 0,)
+          ),
         ],
       ),
     );
+  }
+
+  Widget conditionalBuildBottomBar() {
+    // print("lokasi tujuan : ${focusNodeLokasiTujuan.hasPrimaryFocus}");
+    // print("lokasi jemput : ${focusNodeTitikJemput.hasPrimaryFocus}");
+    return !focusNodeLokasiTujuan.hasFocus && !focusNodeTitikJemput.hasFocus
+        ? Align(
+            alignment: Alignment.bottomCenter,
+            child: buildBottomBar(),
+          )
+        : const SizedBox();
   }
 }
