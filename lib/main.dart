@@ -335,6 +335,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             // bar atas
             buildTopBar(),
             // kamu mau pergi
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: buildBottomBar(),
+            ),
 
             // bottom bar
             Align(
